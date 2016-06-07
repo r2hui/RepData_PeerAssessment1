@@ -1,7 +1,7 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
+title: "Course Project 1"
 author: "r2hui"
-date: "Saturday, March 14, 2015"
+date: "Sunday, June 5, 2016"
 output: html_document
 ---
 
@@ -11,7 +11,7 @@ This is a R markdown file for assessing monitoring data from devices such as the
 
 The first part sets the working directory and loads required packages.
 ```{r, echo=TRUE}
-setwd("C:/Users/Christina2/Documents/Data Science/5 - Reproducible Research/PeerAssess1")
+setwd("F:/Documents/Hobbies/Data Science/5 - Reproducible Research/PeerAssess1")
 library(reshape)
 library(reshape2)
 ```
@@ -38,6 +38,10 @@ datcast$interval <- NULL
 hist(datcast$steps)
 ```
 
+The total number of steps taken per day is 
+```{r, echo=TRUE}
+sum(datcast$steps)
+```
 The mean of the average daily steps is 
 ```{r, echo=TRUE}
 mean(datcast$steps)
@@ -92,18 +96,32 @@ The median of the average daily steps, with replaced missing values, is:
 median(datcastWriteNA$steps)
 ```
 
+There is a difference in the median total number of steps from the first part of the assignment. There is virtually no impact in imputing missing data on the estimates of the total daily number of steps.
+
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r, echo=TRUE}
-datcastWriteNA$day <- weekdays(as.Date(datcastWriteNA$date))
+dataWriteNA$day <- weekdays(as.Date(dataWriteNA$date))
 
-for (i in 1:61)
+for (i in 1:17568)
 {
-  if (datcastWriteNA[i,3] %in% c("Saturday","Sunday")) {
-    datcastWriteNA[i,4] <- "weekend"}
+  if (dataWriteNA[i,4] %in% c("Saturday","Sunday")) {
+    dataWriteNA[i,5] <- "weekend"}
     else {
-      datcastWriteNA[i,4] <- "weekday"
+      dataWriteNA[i,5] <- "weekday"
     }
 }
+
+dataWriteNA_WE <- melt(subset(dataWriteNA,dataWriteNA$V5!="weekday"), id.var="interval", measure.var="steps")
+datacastWriteNA_WE <- dcast(dataWriteNA_WE, interval ~ variable, value.var="value", fun.aggregate = mean)
+
+
+dataWriteNA_WD <- melt(subset(dataWriteNA,dataWriteNA$V5!="weekend"), id.var="interval", measure.var="steps")
+datacastWriteNA_WD <- dcast(dataWriteNA_WD, interval ~ variable, value.var="value", fun.aggregate = mean)
+
+par(mfrow=c(2,1))
+plot(datacastWriteNA_WE, type="l", main="Weekend")
+plot(datacastWriteNA_WD, type="l", main="weekday")
+
 ```
 
 
